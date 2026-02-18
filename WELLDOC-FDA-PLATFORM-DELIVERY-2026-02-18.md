@@ -34,8 +34,8 @@ cd welldoc_prj
 
 | User | Username | Password | Role |
 |------|----------|----------|------|
-| Admin | `kevin` | `WellDoc26!` | Admin (full access) |
-| Reviewer | `ron` | `WellDoc26!` | Standard user |
+| Admin | `kevin` | `WellDoc2026!` | Admin (full access) |
+| Reviewer | `ron` | `WellDoc2026!` | Standard user |
 
 ---
 
@@ -240,7 +240,7 @@ docker-compose up -d
 curl -X POST http://localhost:8660/api/v1/admin/seed-knowledge-base \
   -H "Authorization: Bearer $(curl -s -X POST http://localhost:8660/api/v1/auth/login \
   -H 'Content-Type: application/json' \
-  -d '{"username":"kevin","password":"WellDoc26!"}' | python3 -c 'import sys,json; print(json.load(sys.stdin)["access_token"])')"
+  -d '{"username":"kevin","password":"WellDoc2026!"}' | python3 -c 'import sys,json; print(json.load(sys.stdin)["access_token"])')"
 
 # Access
 # Frontend: http://localhost:3660
@@ -263,7 +263,7 @@ DEBUG=false
 
 ### 1. Login
 1. Go to http://72.61.11.62:3660
-2. Login: `kevin` / `WellDoc26!`
+2. Login: `kevin` / `WellDoc2026!`
 
 ### 2. Create a Submission
 1. Click **"New Submission"**
