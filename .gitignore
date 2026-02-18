@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+.env
+.venv
+venv/
+env/
+
+# Node
+node_modules/
+.next/
+dist/
+build/
+*.log
+npm-debug.log*
+.npm
+
+# Docker
+.dockerignore
+
+# Database
+*.sqlite3
+*.db
+*.dump
+
+# Uploads
+uploads/
+*.tar.gz
+*.zip
+*.gz
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Secrets
+*.pem
+*.key
+.env.local
+.env.production
+
+# Compiled
+*.pyc

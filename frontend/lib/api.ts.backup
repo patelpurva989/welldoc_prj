@@ -1,0 +1,204 @@
+/**
+ * API Client for FDA Regulatory Automation Platform
+ */
+import axios from 'axios';
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8400';
+
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  timeout: 30000,
+});
+
+// Types
+export interface Submission {
+  id: number;
+  submission_type: string;
+  status: string;
+  device_name: string;
+  device_description?: string;
+  manufacturer?: string;
+  indications_for_use?: string;
+  predicate_device_name?: string;
+  predicate_k_number?: string;
+  clinical_data?: any;
+  generated_submission?: string;
+  substantial_equivalence_analysis?: string;
+  compliance_status: string;
+  compliance_report?: any;
+  created_at: string;
+  updated_at: string;
+  submitted_at?: string;
+}
+
+export interface SubmissionCreate {
+  submission_type: string;
+  device_name: string;
+  device_description?: string;
+  manufacturer?: string;
+  indications_for_use?: string;
+  predicate_device_name?: string;
+  predicate_k_number?: string;
+  clinical_data?: any;
+}
+
+export interface Review {
+  id: number;
+  submission_id: number;
+  reviewer_name: string;
+  reviewer_email: string;
+  section_reviewed: string;
+  comments: string;
+  suggested_changes?: string;
+  approved: number;
+  created_at: string;
+  reviewed_at?: string;
+}
+
+export interface ReviewCreate {
+  submission_id: number;
+  reviewer_name: string;
+  reviewer_email: string;
+  section_reviewed: string;
+  comments: string;
+  suggested_changes?: string;
+  approved: number;
+}
+
+export interface AdverseEvent {
+  id: number;
+  submission_id?: number;
+  event_id: string;
+  device_name: string;
+  event_type: string;
+  severity: string;
+  description: string;
+  ai_analysis?: string;
+  risk_score: number;
+  created_at: string;
+}
+
+export interface PredicateDevice {
+  id: number;
+  k_number: string;
+  device_name: string;
+  manufacturer?: string;
+  device_class?: string;
+  product_code?: string;
+  indications_for_use?: string;
+  decision?: string;
+  decision_date?: string;
+}
+
+// API Functions
+
+// Submissions
+export const createSubmission = async (data: SubmissionCreate): Promise<Submission> => {
+  const response = await apiClient.post('/api/v1/regulatory/submissions', data);
+  return response.data;
+};
+
+export const getSubmissions = async (status?: string): Promise<Submission[]> => {
+  const params = status ? { status } : {};
+  const response = await apiClient.get('/api/v1/regulatory/submissions', { params });
+  return response.data;
+};
+
+export const getSubmission = async (id: number): Promise<Submission> => {
+  const response = await apiClient.get(`/api/v1/regulatory/submissions/${id}`);
+  return response.data;
+};
+
+export const updateSubmission = async (id: number, data: Partial<SubmissionCreate>): Promise<Submission> => {
+  const response = await apiClient.patch(`/api/v1/regulatory/submissions/${id}`, data);
+  return response.data;
+};
+
+export const deleteSubmission = async (id: number): Promise<void> => {
+  await apiClient.delete(`/api/v1/regulatory/submissions/${id}`);
+};
+
+export const generateSubmission = async (
+  submissionId: number,
+  includePredicateAnalysis: boolean = true,
+  includeClinicalSummary: boolean = true
+): Promise<any> => {
+  const response = await apiClient.post('/api/v1/regulatory/generate-submission', {
+    submission_id: submissionId,
+    include_predicate_analysis: includePredicateAnalysis,
+    include_clinical_summary: includeClinicalSummary,
+  });
+  return response.data;
+};
+
+// Reviews
+export const createReview = async (data: ReviewCreate): Promise<Review> => {
+  const response = await apiClient.post('/api/v1/regulatory/reviews', data);
+  return response.data;
+};
+
+export const getSubmissionReviews = async (submissionId: number): Promise<Review[]> => {
+  const response = await apiClient.get(`/api/v1/regulatory/submissions/${submissionId}/reviews`);
+  return response.data;
+};
+
+// Adverse Events
+export const getAdverseEvents = async (deviceName?: string, minRiskScore?: number): Promise<AdverseEvent[]> => {
+  const params: any = {};
+  if (deviceName) params.device_name = deviceName;
+  if (minRiskScore) params.min_risk_score = minRiskScore;
+
+  const response = await apiClient.get('/api/v1/regulatory/adverse-events', { params });
+  return response.data;
+};
+
+export const monitorFAERS = async (deviceName: string): Promise<any> => {
+  const response = await apiClient.get(`/api/v1/regulatory/adverse-events/monitor/${deviceName}`);
+  return response.data;
+};
+
+// Predicate Devices
+export const searchPredicateDevices = async (
+  deviceName?: string,
+  productCode?: string,
+  deviceClass?: string
+): Promise<PredicateDevice[]> => {
+  const params: any = {};
+  if (deviceName) params.device_name = deviceName;
+  if (productCode) params.product_code = productCode;
+  if (deviceClass) params.device_class = deviceClass;
+
+  const response = await apiClient.get('/api/v1/regulatory/predicate-devices', { params });
+  return response.data;
+};
+
+export const getPredicateDevice = async (kNumber: string): Promise<PredicateDevice> => {
+  const response = await apiClient.get(`/api/v1/regulatory/predicate-devices/${kNumber}`);
+  return response.data;
+};
+
+// Compliance
+export const checkCompliance = async (
+  submissionId: number,
+  checkElectronicSignatures: boolean = true,
+  checkAuditTrail: boolean = true,
+  checkRecordRetention: boolean = true
+): Promise<any> => {
+  const response = await apiClient.post('/api/v1/regulatory/compliance/check', {
+    submission_id: submissionId,
+    check_electronic_signatures: checkElectronicSignatures,
+    check_audit_trail: checkAuditTrail,
+    check_record_retention: checkRecordRetention,
+  });
+  return response.data;
+};
+
+export const getComplianceChecklist = async (submissionType: string): Promise<any> => {
+  const response = await apiClient.get(`/api/v1/regulatory/compliance/checklist/${submissionType}`);
+  return response.data;
+};
+
+export default apiClient;
